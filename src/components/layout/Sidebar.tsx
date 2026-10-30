@@ -24,7 +24,6 @@ export const SUPERADMIN_NAV_ITEMS: NavItem[] = [
     label: "Directorio de Modelos",
     href: "/",
     icon: Users,
-    badge: "3",
   },
   {
     label: "Métricas",

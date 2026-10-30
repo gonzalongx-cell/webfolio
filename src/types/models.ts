@@ -1,11 +1,13 @@
-export type ModelStatus = "Activo" | "Pendiente" | "Suspendido";
+export type ProfileRole = "model" | "super_admin";
 
-export interface TalentModel {
+export type ProfileStatus = "active" | "pending" | "suspended";
+
+export interface ProfileRecord {
   id: string;
-  fullName: string;
-  email: string;
-  status: ModelStatus;
-  tenantSlug: string;
-  location: string;
-  updatedAt: string;
+  role: ProfileRole;
+  status: ProfileStatus;
+  full_name: string;
+  contact_email: string;
+  created_at?: string;
+  updated_at?: string;
 }

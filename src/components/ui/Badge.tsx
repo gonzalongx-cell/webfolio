@@ -1,5 +1,5 @@
 import React from "react";
-import type { ModelStatus } from "@/types/models";
+import type { ProfileStatus } from "@/types/models";
 
 type BadgeVariant = "success" | "warning" | "danger" | "neutral";
 
@@ -12,11 +12,13 @@ interface BadgeProps {
 
 const variantStyles: Record<BadgeVariant, { container: string; dot: string }> = {
   success: {
-    container: "bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20",
+    container:
+      "bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20",
     dot: "bg-emerald-500",
   },
   warning: {
-    container: "bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/20",
+    container:
+      "bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/20",
     dot: "bg-amber-500",
   },
   danger: {
@@ -52,15 +54,24 @@ export function Badge({
   );
 }
 
+const STATUS_CONFIG: Record<
+  ProfileStatus,
+  { label: string; variant: BadgeVariant }
+> = {
+  active: { label: "Activo", variant: "success" },
+  pending: { label: "Pendiente", variant: "warning" },
+  suspended: { label: "Suspendido", variant: "danger" },
+};
+
 /**
- * Helper reutilizable para mapear el estado del modelo al estilo semántico del Badge.
+ * Mapea los estados reales de la tabla `profiles` ('active' | 'pending' | 'suspended')
+ * a etiquetas legibles en español y variantes semánticas.
  */
-export function StatusBadge({ status }: { status: ModelStatus }) {
-  const statusToVariant: Record<ModelStatus, BadgeVariant> = {
-    Activo: "success",
-    Pendiente: "warning",
-    Suspendido: "danger",
+export function StatusBadge({ status }: { status: ProfileStatus }) {
+  const config = STATUS_CONFIG[status] ?? {
+    label: status,
+    variant: "neutral",
   };
 
-  return <Badge variant={statusToVariant[status]}>{status}</Badge>;
+  return <Badge variant={config.variant}>{config.label}</Badge>;
 }
