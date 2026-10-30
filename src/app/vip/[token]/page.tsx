@@ -1,6 +1,7 @@
 import React from "react";
 import { ShieldAlert, Sparkles, DollarSign, CalendarClock } from "lucide-react";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { VipPortfolioGallery } from "@/components/vip/VipPortfolioGallery";
 import type { PortfolioMediaItem, SkillServiceItem } from "@/types/models";
 
 export const dynamic = "force-dynamic";
@@ -83,41 +84,19 @@ export default async function VipTokenPortfolioPage({
           </span>
         </header>
 
-        {/* Galería */}
+        {/* Galería Interactiva con Lightbox y Carrusel */}
         <section className="space-y-3">
-          <h2 className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
-            Book & Galería ({mediaItems.length})
-          </h2>
-          {mediaItems.length === 0 ? (
-            <p className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center text-xs text-zinc-400">
-              Sin fotos publicadas aún.
-            </p>
-          ) : (
-            <div className="grid grid-cols-2 gap-3">
-              {mediaItems.map((item) => (
-                <div
-                  key={item.id}
-                  className="aspect-[3/4] overflow-hidden rounded-2xl border border-white/10 bg-zinc-900"
-                >
-                  {item.type === "video" ? (
-                    <video
-                      src={item.media_url}
-                      controls
-                      playsInline
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={item.media_url}
-                      alt={modelName}
-                      className="h-full w-full object-cover"
-                    />
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
+          <div className="flex items-center justify-between">
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+              Book & Galería ({mediaItems.length})
+            </h2>
+            {mediaItems.length > 0 && (
+              <span className="text-[11px] text-zinc-500">
+                Toca una foto para ampliar
+              </span>
+            )}
+          </div>
+          <VipPortfolioGallery mediaItems={mediaItems} modelName={modelName} />
         </section>
 
         {/* Servicios Activos */}
