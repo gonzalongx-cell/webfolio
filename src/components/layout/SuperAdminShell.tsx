@@ -1,0 +1,63 @@
+"use client";
+
+import React, { useState } from "react";
+import { Menu, Plus, Search } from "lucide-react";
+import { Sidebar } from "./Sidebar";
+import { Button } from "@/components/ui/Button";
+
+interface SuperAdminShellProps {
+  children: React.ReactNode;
+}
+
+export function SuperAdminShell({ children }: SuperAdminShellProps) {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  return (
+    <div className="flex min-h-screen bg-zinc-50/60 text-zinc-900 antialiased">
+      {/* Menú Lateral Responsivo */}
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+
+      {/* Área de Contenido Principal */}
+      <div className="flex flex-1 flex-col min-w-0">
+        {/* Topbar Minimalista */}
+        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-zinc-200/80 bg-white/85 px-4 backdrop-blur-md sm:px-8">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(true)}
+              className="inline-flex items-center justify-center rounded-lg p-2 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 lg:hidden"
+              aria-label="Abrir menú de navegación"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+
+            <div className="relative hidden sm:block">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+              <input
+                type="search"
+                placeholder="Buscar talento, correo o tenant..."
+                className="h-9 w-64 rounded-lg border border-zinc-200 bg-zinc-50/60 pl-9 pr-3 text-xs text-zinc-800 placeholder:text-zinc-400 transition-colors focus:border-zinc-400 focus:bg-white focus:outline-none md:w-80"
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2.5">
+            <span className="hidden items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-1 text-[11px] font-medium text-zinc-600 md:inline-flex">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              PWA Multi-Tenant v0.1
+            </span>
+            <Button variant="primary" size="sm">
+              <Plus className="h-3.5 w-3.5" />
+              <span>Nuevo Portafolio</span>
+            </Button>
+          </div>
+        </header>
+
+        {/* Contenido de la Vista */}
+        <main className="flex-1 px-4 py-8 sm:px-8">
+          <div className="mx-auto max-w-6xl">{children}</div>
+        </main>
+      </div>
+    </div>
+  );
+}
