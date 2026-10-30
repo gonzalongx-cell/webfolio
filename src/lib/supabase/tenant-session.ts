@@ -6,6 +6,7 @@ export interface TenantSessionContext {
   isAuthenticated: boolean;
   userId: string | null;
   email: string | null;
+  avatarUrl: string | null;
   profile: ProfileRecord | null;
 }
 
@@ -27,20 +28,29 @@ export async function getTenantSession(): Promise<TenantSessionContext> {
         isAuthenticated: false,
         userId: null,
         email: null,
+        avatarUrl: null,
         profile: null,
       };
     }
 
     const { data: profile } = await supabase
       .from("profiles")
-      .select("id, role, status, full_name, contact_email, created_at, updated_at")
+      .select(
+        "id, role, status, full_name, contact_email, avatar_url, created_at, updated_at"
+      )
       .eq("id", user.id)
       .maybeSingle();
+
+    const metaAvatar =
+      (user.user_metadata?.avatar_url as string | undefined) ||
+      (user.user_metadata?.picture as string | undefined) ||
+      null;
 
     return {
       isAuthenticated: true,
       userId: user.id,
       email: user.email ?? null,
+      avatarUrl: (profile as ProfileRecord | null)?.avatar_url ?? metaAvatar,
       profile: (profile as ProfileRecord) ?? null,
     };
   } catch {
@@ -48,6 +58,7 @@ export async function getTenantSession(): Promise<TenantSessionContext> {
       isAuthenticated: false,
       userId: null,
       email: null,
+      avatarUrl: null,
       profile: null,
     };
   }

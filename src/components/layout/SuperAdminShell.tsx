@@ -63,6 +63,12 @@ export function SuperAdminShell({ children }: SuperAdminShellProps) {
 
           <div className="flex items-center gap-2.5">
             <Link
+              href="/login"
+              className="hidden items-center gap-1.5 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-1.5 text-xs font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 sm:inline-flex"
+            >
+              <span>Vista Login</span>
+            </Link>
+            <Link
               href="/app"
               className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50 hover:text-zinc-900"
             >

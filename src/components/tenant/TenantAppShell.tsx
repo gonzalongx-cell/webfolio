@@ -14,9 +14,7 @@ interface TenantAppShellProps {
  */
 export function TenantAppShell({ session, children }: TenantAppShellProps) {
   const displayName =
-    session.profile?.full_name ||
-    session.email ||
-    "Invitada (Inicia sesión RLS)";
+    session.profile?.full_name || session.email || "Talento Webfolio";
 
   return (
     <div className="min-h-dvh bg-zinc-100/80 text-zinc-900 antialiased">
@@ -27,6 +25,7 @@ export function TenantAppShell({ session, children }: TenantAppShellProps) {
           isAuthenticated={session.isAuthenticated}
           fullName={displayName}
           email={session.email}
+          avatarUrl={session.avatarUrl}
         />
 
         {/* Área de Contenido Fluida con Padding para no cortarse con las barras fijas */}
