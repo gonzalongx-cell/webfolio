@@ -1,16 +1,19 @@
 "use client";
 
-import React from "react";
+import React, { useTransition } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Users,
   BarChart3,
   Settings,
   ShieldCheck,
   Sparkles,
+  LogOut,
+  Loader2,
   X,
 } from "lucide-react";
+import { signOutTenantModelAction } from "@/app/(tenant)/app/actions";
 
 export interface NavItem {
   label: string;
@@ -40,10 +43,26 @@ export const SUPERADMIN_NAV_ITEMS: NavItem[] = [
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  adminEmail?: string;
+  adminName?: string;
 }
 
-export function Sidebar({ isOpen, onClose }: SidebarProps) {
+export function Sidebar({
+  isOpen,
+  onClose,
+  adminEmail = "gonzalezgex@gmail.com",
+  adminName = "Súper Administrador",
+}: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [isSigningOut, startSignOut] = useTransition();
+
+  function handleLogout() {
+    startSignOut(async () => {
+      await signOutTenantModelAction();
+      router.replace("/login");
+    });
+  }
 
   return (
     <>
@@ -140,21 +159,35 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           </nav>
         </div>
 
-        {/* Pie del Sidebar: Estado del Rol Administrativo */}
-        <div className="border-t border-zinc-200/70 p-4">
+        {/* Pie del Sidebar: Identidad del Súper Administrador + Cerrar Sesión */}
+        <div className="border-t border-zinc-200/70 p-4 space-y-2.5">
           <div className="flex items-center gap-3 rounded-xl bg-zinc-50 p-3 ring-1 ring-inset ring-zinc-200/70">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-zinc-900/5 text-zinc-800">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-zinc-900 text-white">
               <ShieldCheck className="h-4 w-4" />
             </div>
             <div className="min-w-0 flex-1">
               <p className="truncate text-xs font-semibold text-zinc-900">
-                Súper Administrador
+                {adminName}
               </p>
-              <p className="truncate text-[11px] text-zinc-500">
-                Service Role · Global
+              <p className="truncate font-mono text-[11px] text-zinc-500">
+                {adminEmail}
               </p>
             </div>
           </div>
+
+          <button
+            type="button"
+            disabled={isSigningOut}
+            onClick={handleLogout}
+            className="flex w-full items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs font-medium text-zinc-600 transition-colors hover:bg-zinc-50 hover:text-zinc-900 disabled:opacity-50"
+          >
+            {isSigningOut ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <LogOut className="h-3.5 w-3.5" />
+            )}
+            <span>Cerrar sesión</span>
+          </button>
         </div>
       </aside>
     </>

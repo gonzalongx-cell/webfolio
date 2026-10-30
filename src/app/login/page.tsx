@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
-import { Sparkles, Shield, Lock, EyeOff, Loader2, ArrowUpRight } from "lucide-react";
+import { Sparkles, Shield, Lock, EyeOff, Loader2 } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
@@ -65,13 +64,9 @@ export default function LoginPage() {
           </span>
         </div>
 
-        <Link
-          href="/"
-          className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-zinc-300 transition-colors hover:border-white/20 hover:bg-white/10 hover:text-white"
-        >
-          <span>Consola Admin</span>
-          <ArrowUpRight className="h-3.5 w-3.5" />
-        </Link>
+        <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-medium text-zinc-400">
+          OAuth 2.0 Seguro
+        </span>
       </header>
 
       {/* Sección Central Hero + Login */}

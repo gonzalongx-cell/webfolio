@@ -2,7 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { getTenantSession } from "@/lib/supabase/tenant-session";
 import type { ProfileStatus } from "@/types/models";
+
+const SUPER_ADMIN_EMAIL = "gonzalezgex@gmail.com";
 
 export interface ActionResult {
   success: boolean;
@@ -10,24 +13,38 @@ export interface ActionResult {
   profileId?: string;
 }
 
+async function isAuthorizedSuperAdmin(): Promise<boolean> {
+  const session = await getTenantSession();
+  if (!session.isAuthenticated) return false;
+  return (
+    session.email?.toLowerCase() === SUPER_ADMIN_EMAIL ||
+    session.profile?.role === "super_admin"
+  );
+}
+
 /**
  * 1. Server Action de Onboarding Manual:
- * Invita a un nuevo talento mediante `supabase.auth.admin.inviteUserByEmail`
- * usando `SUPABASE_SERVICE_ROLE_KEY` y sincroniza inmediatamente su registro
- * en `public.profiles` con `role = 'model'` y `status = 'pending'`.
+ * Protegida exclusivamente para `gonzalezgex@gmail.com` (`super_admin`).
  */
 export async function inviteTalentModelAction(formData: {
   fullName: string;
   email: string;
 }): Promise<ActionResult> {
+  if (!(await isAuthorizedSuperAdmin())) {
+    return {
+      success: false,
+      message: "Acceso denegado: Se requieren privilegios de Súper Administrador.",
+    };
+  }
+
   const fullName = formData.fullName?.trim() ?? "";
   const email = formData.email?.trim().toLowerCase() ?? "";
 
-  // Validaciones de servidor
   if (fullName.length < 2) {
     return {
       success: false,
-      message: "Por favor ingresa el nombre completo del talento (mínimo 2 caracteres).",
+      message:
+        "Por favor ingresa el nombre completo del talento (mínimo 2 caracteres).",
     };
   }
 
@@ -42,7 +59,6 @@ export async function inviteTalentModelAction(formData: {
   try {
     const supabaseAdmin = createSupabaseAdminClient();
 
-    // Paso 1: Generar invitación en Supabase Auth con privilegios service_role
     const { data: authData, error: inviteError } =
       await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
         data: {
@@ -62,7 +78,6 @@ export async function inviteTalentModelAction(formData: {
 
     const userId = authData.user.id;
 
-    // Paso 2: Sincronizar inmediatamente en la tabla pública `profiles`
     const { error: profileError } = await supabaseAdmin.from("profiles").upsert(
       {
         id: userId,
@@ -82,7 +97,6 @@ export async function inviteTalentModelAction(formData: {
       };
     }
 
-    // Paso 3: Refrescar el Directorio de Modelos en tiempo real
     revalidatePath("/");
 
     return {
@@ -104,11 +118,19 @@ export async function inviteTalentModelAction(formData: {
 
 /**
  * 2. Server Action administrativa para cambiar el estado de un perfil en `public.profiles`.
+ * Protegida exclusivamente para `gonzalezgex@gmail.com` (`super_admin`).
  */
 export async function updateProfileStatusAction(
   profileId: string,
   newStatus: ProfileStatus
 ): Promise<ActionResult> {
+  if (!(await isAuthorizedSuperAdmin())) {
+    return {
+      success: false,
+      message: "Acceso denegado: Se requieren privilegios de Súper Administrador.",
+    };
+  }
+
   try {
     const supabaseAdmin = createSupabaseAdminClient();
 
@@ -137,7 +159,9 @@ export async function updateProfileStatusAction(
     return {
       success: false,
       message:
-        err instanceof Error ? err.message : "Error inesperado al actualizar estado.",
+        err instanceof Error
+          ? err.message
+          : "Error inesperado al actualizar estado.",
     };
   }
 }

@@ -59,13 +59,15 @@ export function PendingReviewScreen({
             </span>
           </div>
 
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-medium text-zinc-300 hover:bg-white/10"
-          >
-            <span>Consola Admin</span>
-            <ArrowUpRight className="h-3 w-3" />
-          </Link>
+          {session.email?.toLowerCase() === "gonzalezgex@gmail.com" && (
+            <Link
+              href="/"
+              className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-medium text-zinc-300 hover:bg-white/10"
+            >
+              <span>Consola Admin</span>
+              <ArrowUpRight className="h-3 w-3" />
+            </Link>
+          )}
         </header>
 
         {/* Tarjeta Central de Retención / Revisión */}
