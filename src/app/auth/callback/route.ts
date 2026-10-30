@@ -28,16 +28,10 @@ export async function GET(request: Request) {
         email.split("@")[0] ||
         "Usuario Webfolio";
 
-      const avatarUrl =
-        (user.user_metadata?.avatar_url as string | undefined) ||
-        (user.user_metadata?.picture as string | undefined) ||
-        null;
-
       try {
         const supabaseAdmin = createSupabaseAdminClient();
 
         if (isSuperAdmin) {
-          // Garantizar que gonzalezgex@gmail.com tenga rol super_admin y estado active
           await supabaseAdmin.from("profiles").upsert(
             {
               id: user.id,
@@ -45,13 +39,11 @@ export async function GET(request: Request) {
               status: "active",
               full_name: fullName,
               contact_email: email,
-              avatar_url: avatarUrl,
               updated_at: new Date().toISOString(),
             },
             { onConflict: "id" }
           );
         } else {
-          // Para modelos: si aún no existe fila en profiles, crearla como model + pending
           const { data: existingProfile } = await supabaseAdmin
             .from("profiles")
             .select("id")
@@ -65,12 +57,11 @@ export async function GET(request: Request) {
               status: "pending",
               full_name: fullName,
               contact_email: email,
-              avatar_url: avatarUrl,
             });
           }
         }
       } catch {
-        // Fallback silencioso si el trigger SQL ya lo procesó
+        // Fallback silencioso
       }
 
       return NextResponse.redirect(

@@ -9,6 +9,8 @@ import type { ProfileRecord } from "@/types/models";
 // Fuerza renderizado dinámico para consultar datos en tiempo real desde Supabase
 export const dynamic = "force-dynamic";
 
+const SUPER_ADMIN_EMAIL = "gonzalezgex@gmail.com";
+
 function getInitials(name: string): string {
   return name
     .trim()
@@ -37,9 +39,45 @@ async function getProfilesDirectory(): Promise<{
   try {
     const supabaseAdmin = createSupabaseAdminClient();
 
+    // Sincronizar automáticamente cualquier usuario de auth.users que aún no esté en public.profiles
+    const { data: authUsersData } = await supabaseAdmin.auth.admin.listUsers();
+    const { data: existingProfiles } = await supabaseAdmin
+      .from("profiles")
+      .select("id");
+
+    if (authUsersData?.users && existingProfiles) {
+      const existingIds = new Set(existingProfiles.map((p) => p.id));
+      const missingUsers = authUsersData.users.filter(
+        (u) => !existingIds.has(u.id)
+      );
+
+      for (const u of missingUsers) {
+        const email = (u.email ?? "").toLowerCase();
+        const isSuperAdmin = email === SUPER_ADMIN_EMAIL;
+        const fullName =
+          (u.user_metadata?.full_name as string | undefined) ||
+          (u.user_metadata?.name as string | undefined) ||
+          email.split("@")[0] ||
+          "Nuevo Talento";
+
+        await supabaseAdmin.from("profiles").upsert(
+          {
+            id: u.id,
+            role: isSuperAdmin ? "super_admin" : "model",
+            status: isSuperAdmin ? "active" : "pending",
+            full_name: fullName,
+            contact_email: email,
+          },
+          { onConflict: "id" }
+        );
+      }
+    }
+
     const { data, error } = await supabaseAdmin
       .from("profiles")
-      .select("id, role, status, full_name, contact_email, created_at, updated_at")
+      .select(
+        "id, role, status, full_name, contact_email, created_at, updated_at"
+      )
       .eq("role", "model")
       .order("created_at", { ascending: false });
 
@@ -56,7 +94,9 @@ async function getProfilesDirectory(): Promise<{
     };
   } catch (err) {
     const message =
-      err instanceof Error ? err.message : "Error desconocido al conectar con Supabase.";
+      err instanceof Error
+        ? err.message
+        : "Error desconocido al conectar con Supabase.";
     return {
       profiles: [],
       errorMessage: message,
@@ -70,7 +110,9 @@ export default async function DirectorioModelosPage() {
   // Cálculo real de tarjetas de resumen a partir de `public.profiles`
   const activeCount = profiles.filter((p) => p.status === "active").length;
   const pendingCount = profiles.filter((p) => p.status === "pending").length;
-  const suspendedCount = profiles.filter((p) => p.status === "suspended").length;
+  const suspendedCount = profiles.filter(
+    (p) => p.status === "suspended"
+  ).length;
 
   const columns: DataTableColumn<ProfileRecord>[] = [
     {
