@@ -1,9 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { Menu, Plus, Search } from "lucide-react";
 import { Sidebar } from "./Sidebar";
 import { Button } from "@/components/ui/Button";
+import {
+  InviteModelSlideOver,
+  ToastViewport,
+  type ToastNotification,
+} from "@/components/directory/InviteModelSlideOver";
 
 interface SuperAdminShellProps {
   children: React.ReactNode;
@@ -11,6 +16,20 @@ interface SuperAdminShellProps {
 
 export function SuperAdminShell({ children }: SuperAdminShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [toasts, setToasts] = useState<ToastNotification[]>([]);
+
+  const handleNotify = useCallback((toast: Omit<ToastNotification, "id">) => {
+    const id = Date.now() + Math.floor(Math.random() * 1000);
+    setToasts((prev) => [...prev, { ...toast, id }]);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((item) => item.id !== id));
+    }, 5000);
+  }, []);
+
+  const handleDismissToast = useCallback((id: number) => {
+    setToasts((prev) => prev.filter((item) => item.id !== id));
+  }, []);
 
   return (
     <div className="flex min-h-screen bg-zinc-50/60 text-zinc-900 antialiased">
@@ -46,7 +65,11 @@ export function SuperAdminShell({ children }: SuperAdminShellProps) {
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
               PWA Multi-Tenant v0.1
             </span>
-            <Button variant="primary" size="sm">
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => setInviteOpen(true)}
+            >
               <Plus className="h-3.5 w-3.5" />
               <span>Nuevo Portafolio</span>
             </Button>
@@ -58,6 +81,16 @@ export function SuperAdminShell({ children }: SuperAdminShellProps) {
           <div className="mx-auto max-w-6xl">{children}</div>
         </main>
       </div>
+
+      {/* Slide-over de Invitación de Talento (Onboarding Manual) */}
+      <InviteModelSlideOver
+        isOpen={inviteOpen}
+        onClose={() => setInviteOpen(false)}
+        onNotify={handleNotify}
+      />
+
+      {/* Sistema de Notificaciones Visuales (Toasts) */}
+      <ToastViewport toasts={toasts} onDismiss={handleDismissToast} />
     </div>
   );
 }
