@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
-import { Menu, Plus, Search } from "lucide-react";
+import Link from "next/link";
+import { Menu, Plus, Search, Smartphone } from "lucide-react";
 import { Sidebar } from "./Sidebar";
 import { Button } from "@/components/ui/Button";
 import {
@@ -61,10 +62,13 @@ export function SuperAdminShell({ children }: SuperAdminShellProps) {
           </div>
 
           <div className="flex items-center gap-2.5">
-            <span className="hidden items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-1 text-[11px] font-medium text-zinc-600 md:inline-flex">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-              PWA Multi-Tenant v0.1
-            </span>
+            <Link
+              href="/app"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50 hover:text-zinc-900"
+            >
+              <Smartphone className="h-3.5 w-3.5 text-zinc-500" />
+              <span>PWA Modelo</span>
+            </Link>
             <Button
               variant="primary"
               size="sm"

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useTransition } from "react";
+import Link from "next/link";
 import {
   MoreHorizontal,
   ExternalLink,
@@ -64,15 +65,15 @@ export function ModelRowActions({ profile }: ModelRowActionsProps) {
           role="menu"
           className="absolute right-0 z-20 mt-1.5 w-52 origin-top-right rounded-xl border border-zinc-200 bg-white p-1.5 shadow-lg ring-1 ring-black/5"
         >
-          <button
-            type="button"
+          <Link
+            href="/app"
             role="menuitem"
             onClick={() => setOpen(false)}
             className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium text-zinc-700 hover:bg-zinc-100"
           >
             <ExternalLink className="h-3.5 w-3.5 text-zinc-400" />
             Ver portafolio privado
-          </button>
+          </Link>
           <button
             type="button"
             role="menuitem"
